@@ -67,10 +67,11 @@ type Client struct {
 }
 
 type Config struct {
-	Url        string `json:"url"`
-	UserAgent  string `json:"user_agent"`
-	Timeout    string `json:"timeout"`
-	TenantName string `json:"tenant_name"`
+	Url        string            `json:"url"`
+	UserAgent  string            `json:"user_agent"`
+	Timeout    string            `json:"timeout"`
+	TenantName string            `json:"tenant_name"`
+	Headers    map[string]string `json:"headers"`
 }
 
 // xclient represents
@@ -259,6 +260,10 @@ func (c *Client) send(state *lib.State, req []byte) (httpext.Response, error) {
 	r.Header.Set("X-Prometheus-Remote-Write-Version", "0.0.2")
 	if c.cfg.TenantName != "" {
 		r.Header.Set("X-Scope-OrgID", c.cfg.TenantName)
+	}
+
+	for k, v := range c.cfg.Headers {
+		r.Header.Set(k, v)
 	}
 
 	duration, err := str2duration.ParseDuration(c.cfg.Timeout)
